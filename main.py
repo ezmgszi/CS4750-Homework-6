@@ -246,6 +246,8 @@ def backtracking(board, depth):
     if depth < 4:
         print("" + "*" * 40 + "\nVariable-assignment " + str(depth + 1) + ":")
         board.printBoard()
+    # stuff was double printing in the for loops, so to avoid this we need to track and make sure not repeating
+    variable_print = 0
     tile = selectTile(board, depth)
     if depth < 4:
         print("tile selected: " + str(tile.getPosition()))
@@ -255,20 +257,22 @@ def backtracking(board, depth):
         return board
     # now the actual backtracking
     for possible_value in tile.getDomain():
-        if depth < 4:
+        if depth < 4 and variable_print == 0:
             print("domain of selected tile is: " + str(tile.domain) + "\ncurrent possible value being tested is: "
                   + str(possible_value))
+            variable_print = 1
         # create a new board with the lowest possible value
         # assign_a_vlaue returns a copy of the given board with the given value
         # it will run forward checking as it assigns this value, if forward checking determines that a value is bad,
         # then assign_a_value will return us None
         new_board = assign_a_value(board, tile, possible_value)
-        if depth < 4:
+        if depth < 4 and (variable_print == 0 or variable_print == 1):
+            variable_print = 2
             if new_board is not None:
                 print("Board state with testing value:")
                 new_board.printBoard()
             else:
-                print("Foward Checking found None\n    No board will be printed")
+                print("Foward Checking found ERROR in domain\n    No board will be printed")
         # if new_board is assigned None, then we need to try the next lowest value in possible_values
         # if it is not none, then we will recursively call backtracking on the new_board
         if new_board is not None:
@@ -281,9 +285,11 @@ def backtracking(board, depth):
             if next_board is not None:
                 if depth < 4:
                     if depth == 3:
-                        print("*" * 40 + "\nRecursion is over, the first 4 variables assigned: ")
+                        print("*" * 40 + "\nRecursion is over, the first 4 variables assigned\n" + "*" * 40)
                     print("Variable-assignment " + str(depth + 1) + "\n    Value assigned to selected tile " + str(
                         tile.getPosition()) + " is: " + str(possible_value))
+                    print("Board state assigned value:")
+                    new_board.printBoard()
                 return next_board
     return None
 
