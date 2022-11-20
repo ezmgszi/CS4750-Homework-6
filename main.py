@@ -2,6 +2,7 @@
 import copy
 import time
 
+
 # global variables
 
 # classes
@@ -19,7 +20,7 @@ class Board:
         # initialize the board, setting all to - to signify a blank space
         for x in range(9):
             for y in range(9):
-                self.board.append(Tile(x+1, y+1, self.determineBlockID(x+1, y+1), '-'))
+                self.board.append(Tile(x + 1, y + 1, self.determineBlockID(x + 1, y + 1), '-'))
         # set the initial tiles based on the provided startingState
         self.setStartingTiles()
 
@@ -30,13 +31,13 @@ class Board:
     def setStartingTiles(self):
         for row in range(9):
             column = 0
-            for tile in self.getRow(row+1):
-                block = self.determineBlockID(row+1, column+1)
+            for tile in self.getRow(row + 1):
+                block = self.determineBlockID(row + 1, column + 1)
                 if self.startingState[row][column] != '-':
                     tile.setValue(self.startingState[row][column])
                     # we can leverage our forward checking algorithm here in order to easily update all domains to start
                     # values
-                    forwardCheck(self, row+1, column+1, block, tile.getValue())
+                    forwardCheck(self, row + 1, column + 1, block, tile.getValue())
                     # then set value of that tiles domain to []
                 else:
                     tile.setValue('-')
@@ -46,21 +47,21 @@ class Board:
     # printBoard(self)
     # prints the current state of the board to standard out
     def printBoard(self):
-        print("-"*25)
+        print("-" * 25)
         # we want to separate the inputs into blocks, which are 3 by 3, keep track and print space for 3
         j = 2
         for row in range(9):
             print("|", end=" ")
             # we want to separate the inputs into blocks, which are 3 by 3, keep track and print space for 3
             i = 2
-            for tile in self.getRow(row+1):
+            for tile in self.getRow(row + 1):
                 print(f"{tile.getValue()}", end=' ')
                 if i % 3 == 1:
                     print('|', end=" ")
                 i += 1
             if j % 3 == 1:
                 print()
-                print("-"*25)
+                print("-" * 25)
             else:
                 print()
             j += 1
@@ -242,10 +243,10 @@ def backtracking(board, depth):
     # check if board is full, if it is then good job we did it, return the completed board
     if board.isBoardFull():
         return board
-    if depth<4:
-        print(""+"*"*40+"\nVariable-assignment " + str(depth+1) + ":")
+    if depth < 4:
+        print("" + "*" * 40 + "\nVariable-assignment " + str(depth + 1) + ":")
         board.printBoard()
-    tile = selectTile(board,depth)
+    tile = selectTile(board, depth)
     if depth < 4:
         print("tile selected: " + str(tile.getPosition()))
     # check if none was returned, this might happen, not sure if it would or not, if it does there was an error in
@@ -263,13 +264,16 @@ def backtracking(board, depth):
         # then assign_a_value will return us None
         new_board = assign_a_value(board, tile, possible_value)
         if depth < 4:
-            print("Board state with testing value:")
-            new_board.printBoard()
+            if new_board is not None:
+                print("Board state with testing value:")
+                new_board.printBoard()
+            else:
+                print("Foward Checking found None\n    No board will be printed")
         # if new_board is assigned None, then we need to try the next lowest value in possible_values
         # if it is not none, then we will recursively call backtracking on the new_board
         if new_board is not None:
             # recursively call backtracking
-            next_board = backtracking(new_board, depth+1)
+            next_board = backtracking(new_board, depth + 1)
             # if we receive none as a board in at any poinit in our backtracking by forward check, then that is a dead
             # path, and we need to choose a different possible value
             # if we never receive a None, then that means we have selected a correct value, so we return this board
@@ -278,7 +282,8 @@ def backtracking(board, depth):
                 if depth < 4:
                     if depth == 3:
                         print("*" * 40 + "\nRecursion is over, the first 4 variables assigned: ")
-                    print("Variable-assignment " + str(depth+1) +"\n    Value assigned to selected tile " + str(tile.getPosition()) + " is: " + str(possible_value))
+                    print("Variable-assignment " + str(depth + 1) + "\n    Value assigned to selected tile " + str(
+                        tile.getPosition()) + " is: " + str(possible_value))
                 return next_board
     return None
 
@@ -393,7 +398,7 @@ def tileDegree(board, tile):
     block = board.getBlock(tile.getBlockValue())
     for tile_block in block:
         # make sure to not add the tile as a degree
-        if tile_block is not tile and tile_block.getValue()=='-':
+        if tile_block is not tile and tile_block.getValue() == '-':
             # don't add if in same row and column, otherwise will be added twice by the next to checks (row, and column)
             if tile_block.x != tile.x and tile_block.y != tile.y:
                 degree_count += 1
@@ -418,7 +423,7 @@ def tileDegree(board, tile):
 def printStartingBoardOption(boardstate, statetitle):
     print("Starting Board Option " + str(statetitle) + ":")
     j = 2
-    print("-"*24)
+    print("-" * 24)
     for row in boardstate:
         print("|", end=" ")
         i = 2
@@ -433,22 +438,27 @@ def printStartingBoardOption(boardstate, statetitle):
         j += 1
     return
 
+
 # main
 def main():
-    print("\n\n"+"=" * 70+"\nCS4750 HW6 Group 30\nMembers:\n    Zac Lipperd\n Description:\n    Implement forward checking "
-                   "together with the backtracking\n    search algorithm with the MRV and degree heuristics for variable "
-                   "\n    selection to solve 9x9 Sudoku puzzle\n"+"=" * 70 + "\n\n**Select one of the following sudoko board "
-                                                                      "instances**\n")
+    print(
+        "\n\n" + "=" * 70 + "\nCS4750 HW6 Group 30\nMembers:\n    Zac Lipperd\n    Carson Rottinghaus\n Description:\n  "
+                            "  Implement forward checking ""together with the backtracking\n    search algorithm with "
+                            "the MRV and degree heuristics for variable ""\n    selection to solve 9x9 Sudoku "
+                            "puzzle\n" + "=" * 70 + "\n\n**Select one of the following sudoko board ""instances**\n")
 
     # set up starting states
-    startA = ["--1--2---", "--5--6-3-", "46---5---", "---1-4---", "6--8--143", "----9-5-8", "8---49-5-", "1--32----", "--9---3--"]
-    startB = ["--5-1----", "--2--4-3-", "1-9---2-6", "2---3----", "-4----7--", "5----7--1", "---6-3---", "-6-1-----", "----7--5-"]
-    startC = ["67-------", "-25------", "-9-56-2--", "3---8-9--", "------8-1", "---47----", "--86---9-", "-------1-", "1-6-5--7-"]
+    startA = ["--1--2---", "--5--6-3-", "46---5---", "---1-4---", "6--8--143", "----9-5-8", "8---49-5-", "1--32----",
+              "--9---3--"]
+    startB = ["--5-1----", "--2--4-3-", "1-9---2-6", "2---3----", "-4----7--", "5----7--1", "---6-3---", "-6-1-----",
+              "----7--5-"]
+    startC = ["67-------", "-25------", "-9-56-2--", "3---8-9--", "------8-1", "---47----", "--86---9-", "-------1-",
+              "1-6-5--7-"]
     # print options to easy see
     printStartingBoardOption(startA, 'A')
     printStartingBoardOption(startB, 'B')
     printStartingBoardOption(startC, 'C')
-    print("\n\n"+"="*40+"\n\n")
+    print("\n\n" + "=" * 40 + "\n\n")
     while True:
         print("Select board you want from above (A,B or C)")
         print("(or enter X to exit the program)")
@@ -477,13 +487,12 @@ def main():
             board = Board(choice)
             board.printBoard()
             start = time.time()
-            board = backtracking(board,0)
+            board = backtracking(board, 0)
             end = time.time()
             print("*******************************************\nSolved Board State for instance: " + selection)
             board.printBoard()
             total_time = end - start
-            print("Total Execution time of: " + str(total_time)+"\n\n")
-
+            print("Total Execution time of: " + str(total_time) + "\n\n")
 
 
 if __name__ == "__main__":
